@@ -240,3 +240,24 @@ def check_port(local_host_ip, client_machine_local_port):
 
 
 check_port("127.0.0.1", "5700")
+
+# # ----------------------------------------------------------------------------------------
+# # Validation for Config File if config file is there then appending downloaded config file
+# # ----------------------------------------------------------------------------------------
+# def config_file_validation(client_machine_ssh_path, pwd_current_path, key_files):
+#     private_key_files = get_scp_batch_file_format(private_keys=key_files)
+#     keys_without_config_private = key_files.copy()
+#     keys_without_config_private.remove("config")
+#     if Path(client_machine_ssh_path + "/config").is_file() and (IS_CONFIG_FILE_REPLACABLE.upper() == "N"):
+#         print("config file exists")
+#         scp_transfer(user_name=SOURCE_VM_USER, host_name=SOURCE_VM_HOST, password=VM_HOST_PASSWORD,
+#                      file_name="~/.ssh/config",
+#                      path=pwd_current_path + "/")
+#         f1 = open(client_machine_ssh_path + "/config", 'a+')
+#         f2 = open(pwd_current_path + "/config", 'r')
+#         f1.write(f2.read())
+#         subprocess.call(['rm', pwd_current_path + "/config"])
+#         updated_files = get_scp_batch_file_format(keys_without_config_private)
+#         return updated_files
+#     else:
+#         return private_key_files
