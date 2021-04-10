@@ -25,7 +25,7 @@ from datetime import datetime
 #    python3 adb_connect.py
 #
 #  HISTORY
-#     2021/04/06 : nkalli : Script creation
+#     2021/04/06 : Nagarjun Reddy Kalli(nkalli) : Script creation
 #
 
 # Before running this script you need to source all the path of Oracle Database
@@ -215,8 +215,6 @@ def connect_to_cluster_validation(client_machine_ssh_path):
 # ----------------------------------------------
 def connect_to_clusters():
     files = get_scp_batch_file_format(private_keys=FILES_TO_COPY)
-    # files = config_file_validation(client_machine_ssh_path=SSH_PATH, pwd_current_path=current_path,
-    #                                key_files=FILES_TO_COPY)
     backup_old_keys(files_to_copy=FILES_TO_COPY, ssh_path=SSH_PATH)
     scp_transfer(user_name=SOURCE_VM_USER, host_name=SOURCE_VM_HOST, password=VM_HOST_PASSWORD,
                  file_name=files,
@@ -254,11 +252,11 @@ def connect_to_server_and_database(node_name):
     file1 = open(TNS_ADMIN + "/tnsnames.ora", "a")
     file1.write(string)
     file1.close()
-    print("Now you can connect to both cluster and the ADB database directly\n")
+    print("\nNow you can connect to both cluster and the ADB database directly\n")
 
 
 # ----------------------------------------------------------------------------------------------
-# to check whether the node_name entered in the config file is there in cluster list map or not
+# To check whether the node_name entered in the config file is there in cluster list map or not
 # ----------------------------------------------------------------------------------------------
 def cluster_parameter_validation(node_name):
     if not (node_name in cluster_list.keys()):
@@ -273,6 +271,9 @@ def get_vm_cluster_map(value, cluster_list_vm1, cluster_list_vm2):
         return cluster_list_vm2
 
 
+# ------------------------------------------------------
+# TO get free port in client machine for port forwarding
+# ------------------------------------------------------
 def get_open_port():
     import socket
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -310,6 +311,9 @@ def run_shell_cmd(cmd):
     return output
 
 
+# ------------------------------------------------------------------------
+# TO Backup the keys and config file if already present in the .ssh folder
+# ------------------------------------------------------------------------
 def backup_old_keys(files_to_copy, ssh_path):
     new_files = files_to_copy.copy()
     now = datetime.now()
@@ -322,6 +326,9 @@ def backup_old_keys(files_to_copy, ssh_path):
             print(x + " name changed to " + x + "_" + dt_string)
 
 
+# ------------------
+# To Run Sql Scripts
+# ------------------
 def run_sql_plus(sql_plus_script, connect_string):
     p = subprocess.Popen(['sqlplus', '-s', connect_string], stdin=subprocess.PIPE,
                          stdout=subprocess.PIPE, stderr=subprocess.PIPE)

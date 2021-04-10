@@ -30,9 +30,6 @@ SSH_PATH = "/Users/kalli/.ssh"
 # FILES_TO_COPY : List of files required to copy from source VM:
 FILES_TO_COPY = ["atp_rsa", "bastion_rsa", "racteam_rsa", "wecra.rsa", "config"]
 
-# # if config file is present can we replace it (Y or N)
-# IS_CONFIG_FILE_REPLACABLE = "y"
-
 # ----------------------------------------------------------------------
 # Parameters for OPT_TYPE - 2 : Connect to ADBD Database from Local Host
 # ----------------------------------------------------------------------
@@ -51,10 +48,6 @@ PDB_SERVICE_NAME = "OLTPPDB1_tp.atp.oraclecloud.com"
 # NODE_NAME : Enter the node detail where pdb is running.
 # Syntax : NODE_NAME = [Cluster]_[node]. e.g. NODE_NAME = 1209_2
 NODE_NAME = "1209_2"
-
-# # LOCAL_PORT_TO_FORWARD : To connect to ADBD PDB, a local port need to be forwarded. Choose a local free port
-# # to check free port use command: netstat -tulpn | grep LISTEN
-# LOCAL_PORT_TO_FORWARD = "5000"
 
 # TNSADMIN PATH to add the connect String $ORACLE_HOME/network/admin
 TNS_ADMIN = "/Users/kalli/instantclient_19_8/network/admin"
