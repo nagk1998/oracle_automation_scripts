@@ -5,6 +5,7 @@ from pathlib import Path
 import socket
 from cluster_map import *
 from datetime import datetime
+import random
 
 
 #
@@ -239,19 +240,22 @@ def connect_to_server_and_database(node_name):
     node_name = cluster_list[node_name]
     oracle_key_name = node_name + "_oracle"
     print("Executing Option Two Connect to both server and database\n")
-    connect_to_clusters()
-    login_to_unknown_hosts(user_name="root", password="", host_name=node_name)
-    get_oracle_user_private_key(node=node_name, client_machine_ssh_path=SSH_PATH,
-                                node_oracle_key_name=oracle_key_name)
-    change_file_permission(client_machine_ssh_path=SSH_PATH, files_to_change_permission=[oracle_key_name])
     node_ip = get_ip_address(node=node_name)
-    port_forwarding(file_name=oracle_key_name, forwarded_port=LOCAL_PORT_TO_FORWARD, db_port=DB_PORT,
-                    remote_node_name=node_name, remote_node_ip=node_ip, client_machine_ssh_path=SSH_PATH)
-    string = gen_connect_string(host_name=LOCAL_HOST_IP, adb_pdb_name=PDB_NAME, port_number=LOCAL_PORT_TO_FORWARD,
-                                pdb_service_name=PDB_SERVICE_NAME)
-    file1 = open(TNS_ADMIN + "/tnsnames.ora", "a")
-    file1.write(string)
-    file1.close()
+    port_list = to_get_forwarded_port_list(node_ip=node_ip)
+    port = random.choice(port_list)
+    if port != "":
+        LOCAL_PORT_TO_FORWARD = port
+    else:
+        connect_to_clusters()
+        login_to_unknown_hosts(user_name="root", password="", host_name=node_name)
+        get_oracle_user_private_key(node=node_name, client_machine_ssh_path=SSH_PATH,
+                                    node_oracle_key_name=oracle_key_name)
+        change_file_permission(client_machine_ssh_path=SSH_PATH, files_to_change_permission=[oracle_key_name])
+        port_forwarding(file_name=oracle_key_name, forwarded_port=LOCAL_PORT_TO_FORWARD, db_port=DB_PORT,
+                        remote_node_name=node_name, remote_node_ip=node_ip, client_machine_ssh_path=SSH_PATH)
+    to_remove_previous_tns_alias(tns_admin=TNS_ADMIN, tns_alias=PDB_NAME)
+    add_connect_string(local_host_ip=LOCAL_HOST_IP, pdb_service_name=PDB_SERVICE_NAME, pdb_name=PDB_NAME,
+                       tns_admin=TNS_ADMIN, local_port_to_forward=LOCAL_PORT_TO_FORWARD)
     print("\nNow you can connect to both cluster and the ADB database directly\n")
 
 
@@ -353,6 +357,29 @@ def sanity_test(pdb_name, pdb_password):
     output1 = run_sql_plus(sql_plus_script=get_pdb_name, connect_string=connect_string)
     output2 = run_sql_plus(sql_plus_script=get_sys_date, connect_string=connect_string)
     print("PDB Name is " + output1 + "\nSYS DATE is " + output2 + "\n")
+
+
+def to_get_forwarded_port_list(node_ip):
+    cmd = "ps -ef | grep ssh | grep " + node_ip + \
+          "| grep -v grep | awk '{ print $15 }' | awk -F \":\" '{ print $1}'"
+    output = run_shell_cmd(cmd)
+    port_list = list(str(output).split("\n"))
+    print(port_list)
+    return port_list
+
+
+def add_connect_string(local_host_ip, local_port_to_forward, pdb_service_name, pdb_name, tns_admin):
+    string = gen_connect_string(host_name=local_host_ip, adb_pdb_name=pdb_name, port_number=local_port_to_forward,
+                                pdb_service_name=pdb_service_name)
+    file1 = open(tns_admin + "/tnsnames.ora", "a")
+    file1.write(string)
+    file1.close()
+
+
+def to_remove_previous_tns_alias(tns_alias, tns_admin):
+    tns_admin_file = tns_admin + "/tnsnames.ora"
+    cmd = "sed -i '/" + tns_alias + "/d' tnsnames.ora " + tns_admin_file
+    run_shell_cmd(cmd)
 
 
 # ----------------------------------------------------------------------------------------------------------------------

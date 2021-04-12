@@ -27,7 +27,7 @@ SOURCE_VM_HOST_ID = "VMH1"
 # Client machine .ssh folder path
 SSH_PATH = "/Users/kalli/.ssh"
 
-# FILES_TO_COPY : List of files required to copy from source VM:
+# FILES_TO_COPY : List of files required to copy from source VM:(no need to modify)
 FILES_TO_COPY = ["atp_rsa", "bastion_rsa", "racteam_rsa", "wecra.rsa", "config"]
 
 # ----------------------------------------------------------------------
